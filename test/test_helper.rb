@@ -4,6 +4,8 @@ require "active_support/test_case"
 require "active_support/testing/autorun"
 require "byebug"
 
+require File.expand_path("../../test/dummy/config/environment.rb", __FILE__)
+
 require "active_storage"
 
 require "active_storage/service"
@@ -16,7 +18,6 @@ rescue Errno::ENOENT
 end
 
 
-require "active_storage/service/disk_service"
 require "tmpdir"
 ActiveStorage::Blob.service = ActiveStorage::Service::DiskService.new(root: Dir.mktmpdir("active_storage_tests"))
 ActiveStorage::Service.logger = ActiveSupport::Logger.new(STDOUT)
@@ -31,18 +32,8 @@ class ActiveSupport::TestCase
     end
 end
 
-require "action_controller"
-require "action_controller/test_case"
-
-class ActionController::TestCase
-  Routes = ActionDispatch::Routing::RouteSet.new.tap do |routes|
-    routes.draw do
-      eval(File.read(File.expand_path("../../lib/active_storage/routes.rb", __FILE__)))
-    end
-  end
-end
-
 require "active_storage/attached"
+
 ActiveRecord::Base.send :extend, ActiveStorage::Attached::Macros
 
 require "global_id"
